@@ -31,11 +31,10 @@ def magnet(update, context):
 def register(update, context):
     credentials = context.args
     user_id = update.message.from_user['id']
-    users = {user_id: {"address": credentials[0], "port": credentials[1], "username": credentials[2], "password": credentials[3]}}
-    with open('data.json', 'r+') as file:
+    users = {"address": credentials[0], "port": credentials[1], "username": credentials[2], "password": credentials[3]}
+    with open('data.json', 'r') as file:
         data = json.load(file)
-        temp = data['Users']
-        temp.append(users)
+        data[user_id] = users
     with open('data.json', 'w') as file:
         json.dump(data, file, indent=4)
     context.bot.send_message(chat_id=update.effective_chat.id, text="Вы добавили сервер {0}:{1}, ваш id - {2}".format(credentials[0], credentials[1], user_id))
@@ -43,9 +42,13 @@ def register(update, context):
 
 def add(update, context):
     url = context.args[0]
+    user_id = update.message.from_user['id']
+    with open('data.json', 'r') as file:
+        data = json.load(file)
+    transremote_username = data[user_id]["username"]
+    transremote_password = data[user_id]["password"]
     magnet_link = get_link(url, s)
-    subprocess.call(['transmission-remote', '-n', transremote_user +':'+ transremote_password, '-a', magnet_link])
-
+    subprocess.call(['transmission-remote', '-n', transremote_username + ':' + transremote_password, '-a', magnet_link])
 
 
 start_handler = CommandHandler('start', start)
@@ -56,6 +59,9 @@ dispatcher.add_handler(magnet_handler)
 
 register_handler = CommandHandler('register', register)
 dispatcher.add_handler(register_handler)
+
+add_handler = CommandHandler('add', add)
+dispatcher.add_handler(add_handler)
 
 updater.start_polling()
 
