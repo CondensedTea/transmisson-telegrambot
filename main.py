@@ -3,8 +3,8 @@ from bs4 import BeautifulSoup
 import re
 from telegram.ext import Updater, CommandHandler
 import json
-import token
-
+from tokens import *
+import subprocess
 
 updater = Updater(token, use_context=True)
 
@@ -24,8 +24,7 @@ def start(update, context):
 
 def magnet(update, context):
     url = context.args[0]
-    html_text = load_html(url, s)
-    magnet_link = get_link(html_text)
+    magnet_link = get_link(url, s)
     context.bot.send_message(chat_id=update.effective_chat.id, text="Magnet link: `{}`".format(magnet_link), parse_mode='MarkDown')
 
 
@@ -37,11 +36,16 @@ def register(update, context):
         data = json.load(file)
         temp = data['Users']
         temp.append(users)
-
     with open('data.json', 'w') as file:
         json.dump(data, file, indent=4)
-
     context.bot.send_message(chat_id=update.effective_chat.id, text="Вы добавили сервер {0}:{1}, ваш id - {2}".format(credentials[0], credentials[1], user_id))
+
+
+def add(update, context):
+    url = context.args[0]
+    magnet_link = get_link(url, s)
+    subprocess.call(['transmission-remote', '-n', transremote_user +':'+ transremote_password, '-a', magnet_link])
+
 
 
 start_handler = CommandHandler('start', start)
@@ -56,13 +60,9 @@ dispatcher.add_handler(register_handler)
 updater.start_polling()
 
 
-def load_html(url, session):
+def get_link(url, session):
     request = session.get(url)
-    return request.text
-
-
-def get_link(text):
-    soup = BeautifulSoup(text, 'html.parser')
+    soup = BeautifulSoup(request.text, 'html.parser')
     magnet_link = soup.find('a', {'class': 'magnet-link'})
     match = re.search(r'href=[\'"]?([^\'" >]+)', str(magnet_link))
     return match.group(1)
