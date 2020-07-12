@@ -3,7 +3,10 @@ from bs4 import BeautifulSoup
 import re
 from telegram.ext import Updater, CommandHandler
 import json
-updater = Updater(token='1323800166:AAHC06rNXnQgKPJoCZqpoS8Z0eSOOga6fOs', use_context=True)
+import token
+
+
+updater = Updater(token, use_context=True)
 
 dispatcher = updater.dispatcher
 
