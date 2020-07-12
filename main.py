@@ -45,8 +45,8 @@ def add(update, context):
     user_id = update.message.from_user['id']
     with open('data.json', 'r') as file:
         data = json.load(file)
-    transremote_username = data[user_id]["username"]
-    transremote_password = data[user_id]["password"]
+    transremote_username = data["{}".format(user_id)]["username"]
+    transremote_password = data["{}".format(user_id)]["password"]
     magnet_link = get_link(url, s)
     subprocess.call(['transmission-remote', '-n', transremote_username + ':' + transremote_password, '-a', magnet_link])
 
