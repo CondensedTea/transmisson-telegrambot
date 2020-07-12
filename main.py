@@ -16,14 +16,15 @@ s.headers.update({
 })
 
 welcome_text = "Что бы получить список комманд, наберите /"
-command_list = ("magnet - сделать из ссылки на тему rutracker.org magnet-ссылку",
-                "register - зарегистрировать сервер с transmission-remote. /register <address> <port> <login> <password>",
-                "add - добавить на сервер с вашими данными торрент по ссылке на тему rutacker.org")
+# command_list = ("magnet - сделать из ссылки на тему rutracker.org magnet-ссылку",
+#                "register - зарегистрировать сервер с transmission-remote. /register <address> <port> <login> <password>",
+#                "add - добавить на сервер с вашими данными торрент по ссылке на тему rutacker.org")
 
 
 def start(update, context):
     context.bot.send_message(chat_id=update.effective_chat.id, text=welcome_text)
-    context.bot.set_my_commands(commands=command_list)
+    # context.bot.set_my_commands(commands=command_list)
+
 
 def magnet(update, context):
     url = context.args[0]
