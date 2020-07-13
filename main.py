@@ -57,6 +57,18 @@ def add(update, context):
     subprocess.call(['transmission-remote', transremote_address + ':' + transremote_port, '-n', transremote_username + ':' + transremote_password, '-a', magnet_link])
 
 
+def transmission_list(update, context):
+    user_id_quotes = '{}'.format(update.message.from_user['id'])
+    with open('data.json', 'r') as file:
+        data = json.load(file)
+    transremote_address = data[user_id_quotes]["address"]
+    transremote_port = data[user_id_quotes]["port"]
+    transremote_username = data[user_id_quotes]["username"]
+    transremote_password = data[user_id_quotes]["password"]
+    list_table = subprocess.call(['transmission-remote', transremote_address + ':' + transremote_port, '-n', transremote_username + ':' + transremote_password, '-l'])
+    context.bot.send_message(chat_id=update.effective_chat.id, text=list_table)
+
+
 start_handler = CommandHandler('start', start)
 dispatcher.add_handler(start_handler)
 
@@ -68,6 +80,9 @@ dispatcher.add_handler(register_handler)
 
 add_handler = CommandHandler('add', add)
 dispatcher.add_handler(add_handler)
+
+transmission_list_handler = CommandHandler('transmission_list', transmission_list)
+dispatcher.add_handler(transmission_list_handler)
 
 updater.start_polling()
 
