@@ -21,6 +21,7 @@ welcome_text = "Что бы получить список комманд, наб
 #                "register - зарегистрировать сервер с transmission-remote. /register <address> <port> <login> <password>",
 #                "add - добавить на сервер с вашими данными торрент по ссылке на тему rutacker.org")
 
+data_path = "/home/pi/telegram/rutracker-py/data.json"
 
 def start(update, context):
     context.bot.send_message(chat_id=update.effective_chat.id, text=welcome_text)
@@ -37,10 +38,10 @@ def transmission(update, context):
     credentials = context.args
     user_id = update.message.from_user['id']
     users = {"address": credentials[0], "port": credentials[1], "username": credentials[2], "password": credentials[3]}
-    with open('data.json', 'r') as file:
+    with open(data_path, 'r') as file:
         data = json.load(file)
         data[user_id] = users
-    with open('data.json', 'w') as file:
+    with open('data_path', 'w') as file:
         json.dump(data, file, indent=4)
     context.bot.send_message(chat_id=update.effective_chat.id, text="Вы добавили сервер {0}:{1}".format(credentials[0], credentials[1]))
 
@@ -48,7 +49,7 @@ def transmission(update, context):
 def add(update, context):
     url = context.args[0]
     user_id_quotes = '{}'.format(update.message.from_user['id'])
-    with open('data.json', 'r') as file:
+    with open('data_path', 'r') as file:
         data = json.load(file)
     transremote_address = data[user_id_quotes]["address"]
     transremote_port = data[user_id_quotes]["port"]
@@ -60,7 +61,7 @@ def add(update, context):
 
 def transmission_list(update, context):
     user_id_quotes = '{}'.format(update.message.from_user['id'])
-    with open('data.json', 'r') as file:
+    with open('data_path', 'r') as file:
         data = json.load(file)
     transremote_address = data[user_id_quotes]["address"]
     transremote_port = data[user_id_quotes]["port"]
