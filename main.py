@@ -5,6 +5,7 @@ from telegram.ext import Updater, CommandHandler
 import json
 from tokens import *
 import subprocess
+from subprocess import check_output
 
 updater = Updater(token, use_context=True)
 
@@ -65,7 +66,7 @@ def transmission_list(update, context):
     transremote_port = data[user_id_quotes]["port"]
     transremote_username = data[user_id_quotes]["username"]
     transremote_password = data[user_id_quotes]["password"]
-    list_table = subprocess.call(['transmission-remote', transremote_address + ':' + transremote_port, '-n', transremote_username + ':' + transremote_password, '-l'])
+    list_table = check_output(['transmission-remote', transremote_address + ':' + transremote_port, '-n', transremote_username + ':' + transremote_password, '-l'])
     context.bot.send_message(chat_id=update.effective_chat.id, text=list_table)
 
 
