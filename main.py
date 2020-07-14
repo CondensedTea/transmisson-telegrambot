@@ -67,7 +67,7 @@ def transmission_list(update, context):
     transremote_username = data[user_id_quotes]["username"]
     transremote_password = data[user_id_quotes]["password"]
     list_table = check_output(['transmission-remote', transremote_address + ':' + transremote_port, '-n', transremote_username + ':' + transremote_password, '-l'])
-    context.bot.send_message(chat_id=update.effective_chat.id, text=list_table)
+    context.bot.send_message(chat_id=update.effective_chat.id, text=list_table.decode('utf-8'))
 
 
 start_handler = CommandHandler('start', start)
