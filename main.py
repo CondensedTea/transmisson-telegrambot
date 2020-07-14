@@ -32,7 +32,7 @@ def magnet(update, context):
     context.bot.send_message(chat_id=update.effective_chat.id, text="Magnet link: `{}`".format(magnet_link), parse_mode='MarkDown')
 
 
-def register(update, context):
+def transmission(update, context):
     credentials = context.args
     user_id = update.message.from_user['id']
     users = {"address": credentials[0], "port": credentials[1], "username": credentials[2], "password": credentials[3]}
@@ -75,8 +75,8 @@ dispatcher.add_handler(start_handler)
 magnet_handler = CommandHandler('magnet', magnet)
 dispatcher.add_handler(magnet_handler)
 
-register_handler = CommandHandler('register', register)
-dispatcher.add_handler(register_handler)
+transmission_handler = CommandHandler('register', transmission)
+dispatcher.add_handler(transmission_handler)
 
 add_handler = CommandHandler('add', add)
 dispatcher.add_handler(add_handler)
