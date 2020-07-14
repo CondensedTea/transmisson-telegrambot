@@ -41,7 +41,7 @@ def transmission(update, context):
     with open(data_path, 'r') as file:
         data = json.load(file)
         data[user_id] = users
-    with open('data_path', 'w') as file:
+    with open(data_path, 'w') as file:
         json.dump(data, file, indent=4)
     context.bot.send_message(chat_id=update.effective_chat.id, text="Вы добавили сервер {0}:{1}".format(credentials[0], credentials[1]))
 
@@ -49,7 +49,7 @@ def transmission(update, context):
 def add(update, context):
     url = context.args[0]
     user_id_quotes = '{}'.format(update.message.from_user['id'])
-    with open('data_path', 'r') as file:
+    with open(data_path, 'r') as file:
         data = json.load(file)
     transremote_address = data[user_id_quotes]["address"]
     transremote_port = data[user_id_quotes]["port"]
@@ -61,7 +61,7 @@ def add(update, context):
 
 def transmission_list(update, context):
     user_id_quotes = '{}'.format(update.message.from_user['id'])
-    with open('data_path', 'r') as file:
+    with open(data_path, 'r') as file:
         data = json.load(file)
     transremote_address = data[user_id_quotes]["address"]
     transremote_port = data[user_id_quotes]["port"]
