@@ -21,7 +21,8 @@ welcome_text = "Что бы получить список комманд, наб
 #                "register - зарегистрировать сервер с transmission-remote. /register <address> <port> <login> <password>",
 #                "add - добавить на сервер с вашими данными торрент по ссылке на тему rutacker.org")
 
-data_path = "/home/pi/telegram/rutracker-py/data.json"
+#data_path = "/home/pi/telegram/rutracker-py/data.json"
+data_path = "data.json"
 
 def start(update, context):
     context.bot.send_message(chat_id=update.effective_chat.id, text=welcome_text)
@@ -40,6 +41,8 @@ def transmission(update, context):
     users = {"address": credentials[0], "port": credentials[1], "username": credentials[2], "password": credentials[3]}
     with open(data_path, 'r') as file:
         data = json.load(file)
+        if user_id in [user_id]:  # найс костыль бро !!!
+            del data["{}".format(user_id)]
         data[user_id] = users
     with open(data_path, 'w') as file:
         json.dump(data, file, indent=4)
@@ -47,7 +50,6 @@ def transmission(update, context):
 
 
 def add(update, context):
-    url = context.args[0]
     user_id_quotes = '{}'.format(update.message.from_user['id'])
     with open(data_path, 'r') as file:
         data = json.load(file)
@@ -55,7 +57,14 @@ def add(update, context):
     transremote_port = data[user_id_quotes]["port"]
     transremote_username = data[user_id_quotes]["username"]
     transremote_password = data[user_id_quotes]["password"]
-    magnet_link = get_link(url, s)
+    if "https://rutracker.org/forum/viewtopic.php?t=" in context.args[0]:
+        url = context.args[0]
+        magnet_link = get_link(url, s)
+    elif "magnet:?xt=urn:btih:" in context.args[0]:
+        magnet_link = context.args[0]
+    else:
+        context.bot.send_message(chat_id=update.effective_chat.id, text="Введеная ссылка не подходит. Введите ссылку на топик на rutracker.org или magnet-ссылку")
+        return
     subprocess.call(['transmission-remote', transremote_address + ':' + transremote_port, '-n', transremote_username + ':' + transremote_password, '-a', magnet_link])
 
 
