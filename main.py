@@ -22,8 +22,6 @@ command_list = [("server", "зарегистрировать сервер с tra
                 ("magnet", "Сделать из ссылки на тему rutracker.org 🧲 magnet-ссылку")]
 
 data_path: str = "/home/pi/telegram/rutracker-py/data.json"
-# data_path = "data.json"
-
 
 def start(update, context):
     context.bot.send_message(chat_id=update.effective_chat.id, text=welcome_text)
@@ -107,7 +105,7 @@ def get_link(url, session):
 
 def json_auth(user_id):
     user_id_quotes = '{}'.format(user_id)
-    with open('data.json', 'r') as file:
+    with open(data_path, 'r') as file:
         data = json.load(file)
     transremote_address = data[user_id_quotes]["address"]
     transremote_port = data[user_id_quotes]["port"]
