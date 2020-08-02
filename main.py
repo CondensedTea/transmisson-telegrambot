@@ -16,12 +16,14 @@ s.headers.update({
 })
 
 welcome_text = "Что бы получить список комманд, наберите /"
-command_list = [("server", "зарегистрировать сервер с transmission-remote \n /register <address> <port> <login> <password>"),
+command_list = [("server", "Зарегистрировать сервер с transmission-remote, /register <address> <port> <login> <password>"),
                 ("add", "Добавить на сервер торрент по ссылке на тему или по 🧲 magnet-ссылке"),
                 ("list_torrents", "Вывести список торрентов и их состояние загрузки"),
                 ("magnet", "Сделать из ссылки на тему rutracker.org 🧲 magnet-ссылку")]
 
-data_path: str = "/home/pi/telegram/rutracker-py/data.json"
+# data_path: str = "/home/pi/telegram/rutracker-py/data.json"
+data_path = "data.json"
+
 
 def start(update, context):
     context.bot.send_message(chat_id=update.effective_chat.id, text=welcome_text)
@@ -30,18 +32,25 @@ def start(update, context):
 
 def magnet(update, context):
     url = context.args[0]
-    magnet_link = get_link(url, s)
+    try:
+        magnet_link = get_link(url, s)
+    except AttributeError:
+        context.bot.send_message(chat_id=update.effective_chat.id, text="Неподходящяя ссылка")
+        return
     context.bot.send_message(chat_id=update.effective_chat.id, text="🧲Magnet-ссылка: `{}`".format(magnet_link), parse_mode='MarkDown')
 
 
 def server(update, context):
     credentials = context.args
+    if len(credentials) != 4:
+        context.bot.send_message(chat_id=update.effective_chat.id, text="Вам необходимо ввести 4 параметра: адресс, порт, логин и пароль")
+        return
     user_id = update.message.from_user['id']
     users = {"address": credentials[0], "port": credentials[1], "username": credentials[2], "password": credentials[3]}
     with open(data_path, 'r') as file:
         data = json.load(file)
-        if user_id in [user_id]:  # найс костыль бро !!!
-            del data["{}".format(user_id)]
+        if f"{user_id}" in data:
+            del data[f"{user_id}"]
         data[user_id] = users
     with open(data_path, 'w') as file:
         json.dump(data, file, indent=4)
@@ -49,7 +58,11 @@ def server(update, context):
 
 
 def add(update, context):
-    json_data = json_auth(update.message.from_user['id'])
+    try:
+        json_data = json_auth(update.message.from_user['id'])
+    except KeyError:
+        context.bot.send_message(chat_id=update.effective_chat.id, text="Вам необходимо добавить сервер при помощи /server")
+        return
     c = Client(host=json_data[0], port=json_data[1], username=json_data[2], password=json_data[3])
     fulltorrentlist = c.get_torrents()
     if "https://rutracker.org/forum/viewtopic.php?t=" in context.args[0]:
@@ -65,7 +78,11 @@ def add(update, context):
 
 
 def list_torrents(update, context):
-    json_data = json_auth(update.message.from_user['id'])
+    try:
+        json_data = json_auth(update.message.from_user['id'])
+    except KeyError:
+        context.bot.send_message(chat_id=update.effective_chat.id, text="Вам необходимо добавить сервер при помощи /server")
+        return
     c = Client(host=json_data[0], port=json_data[1], username=json_data[2], password=json_data[3])
     torrent_name_list = ""
     for torrent in c.get_torrents():
@@ -104,7 +121,7 @@ def get_link(url, session):
 
 
 def json_auth(user_id):
-    user_id_quotes = '{}'.format(user_id)
+    user_id_quotes = f"{user_id}"
     with open(data_path, 'r') as file:
         data = json.load(file)
     transremote_address = data[user_id_quotes]["address"]
@@ -112,3 +129,4 @@ def json_auth(user_id):
     transremote_username = data[user_id_quotes]["username"]
     transremote_password = data[user_id_quotes]["password"]
     return transremote_address, transremote_port, transremote_username, transremote_password
+
